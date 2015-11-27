@@ -1,4 +1,6 @@
 import lasagne
+import theano.tensor as T
+import theano
 
 # Set NTM layer
 
@@ -33,7 +35,23 @@ class NTM(lasagne.layers.RecurrentLayer):
 		T.tanh(T.dot(h, Wk) + bk)
 		T.dot(h, Wc) + bc
 
+	def _cosine(self, u, v):
+		return u*v/(T.norm(u) * T.norm(v))
+
+	def _content(self, u, v, beta):
+		''' Content system
+		'''
+		return TT.nnet.softmax(beta * self._cosine(u, v))
+
 	def _location_w(self, wc, g, wprev, S):
+		'''
+		   g - interpolation gate \in (0,1)
+		   wprev - weights on previous time-step
+		   wc - weights produced by the content system
+
+		   Output:
+		     gated weights
+		'''
 		wg = g * wc + (1 - g) * wprev
 		wt = (wg * S).sum(axis=1)
 
