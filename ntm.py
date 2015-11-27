@@ -61,5 +61,10 @@ class NTM(lasagne.layers.RecurrentLayer):
 		wg = g * wc + (1 - g) * wprev
 		wt = (wg * S).sum(axis=1)
 
+	def get_output_for(self, input):
+		''' Main methiod for return result from NTM layer
+		'''
+		pass
+
 
 
