@@ -29,11 +29,17 @@ class NTM(lasagne.layers.RecurrentLayer):
 		pass
 
 	def _controller(self, hidden, Ws, bs, Wc, bc, Wk, bk):
-		''' Provide controller output
+		''' 
+		    Controller network
+		    Provide controller output
 		    And provides external output
+		    It can be used as several types of networks
+		    Returns number of read and writes heads
 		'''
-		T.tanh(T.dot(h, Wk) + bk)
-		T.dot(h, Wc) + bc
+		itemhead = T.nnet.softmax(T.tanh(T.dot(h, Ws) + bs))
+		itemwrite = T.nnet.tanh(T.dot(h, Wc) + bc)
+		itemshifts = T.nnet.relu(T.dot(h, Wk) + bk)
+		return itemhead, itemwrite, itemshifts
 
 	def _cosine(self, u, v):
 		return u*v/(T.norm(u) * T.norm(v))
@@ -41,7 +47,7 @@ class NTM(lasagne.layers.RecurrentLayer):
 	def _content(self, u, v, beta):
 		''' Content system
 		'''
-		return TT.nnet.softmax(beta * self._cosine(u, v))
+		return T.nnet.softmax(beta * self._cosine(u, v))
 
 	def _location_w(self, wc, g, wprev, S):
 		'''
